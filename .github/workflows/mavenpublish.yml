@@ -9,10 +9,11 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  version: 1.0.$GITHUB_RUN_NUMBER
+
 jobs:
-  maven-build:
-    env:
-      version: 1.0.$GITHUB_RUN_NUMBER
+  mvn-and-docker-build-push:
     runs-on: ubuntu-latest
     steps:
       
