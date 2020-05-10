@@ -59,8 +59,6 @@ jobs:
         # Change all uppercase to lowercase
         IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
-        docker tag $module $IMAGE_ID:latest
-        docker push $IMAGE_ID:latest
         docker tag $module $IMAGE_ID:$version
         docker push $IMAGE_ID:$version
 
@@ -73,7 +71,5 @@ jobs:
         # Change all uppercase to lowercase
         IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
-        docker tag $module $IMAGE_ID:latest
-        docker push $IMAGE_ID:latest
         docker tag $module $IMAGE_ID:$version
         docker push $IMAGE_ID:$version
