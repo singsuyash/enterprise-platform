@@ -6,10 +6,11 @@ name: Maven Package
 on:
   push:
     branches: [ master ]
+    tags:
+      - v*
   pull_request:
     branches: [ master ]
-  tags:
-    - v*
+  
 env:
   ORG: singsuyash
   TAG: 1.0.$GITHUB_RUN_NUMBER
