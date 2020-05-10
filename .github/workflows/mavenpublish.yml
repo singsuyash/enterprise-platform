@@ -36,9 +36,6 @@ jobs:
     
     - name: Display spring-cloud-config-server target folder
       run: ls -halt spring-cloud-config-server/target
-    
-    - name: Maven version revert
-      run: mvn versions:revert
 
     - name: Publish to GitHub Packages Apache Maven
       run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
