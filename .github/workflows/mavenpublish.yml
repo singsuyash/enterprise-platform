@@ -72,6 +72,8 @@ jobs:
 
         docker tag $module $IMAGE_ID:$VERSION
         docker push $IMAGE_ID:$VERSION
+        docker tag $module $IMAGE_ID:1.0.$GITHUB_RUN_NUMBER
+        docker push $IMAGE_ID:1.0.$GITHUB_RUN_NUMBER
 
     - name: docker push spring-cloud-config-server to github packages
       env:
@@ -96,3 +98,5 @@ jobs:
 
         docker tag $module $IMAGE_ID:$VERSION
         docker push $IMAGE_ID:$VERSION
+        docker tag $module $IMAGE_ID:1.0.$GITHUB_RUN_NUMBER
+        docker push $IMAGE_ID:1.0.$GITHUB_RUN_NUMBER
