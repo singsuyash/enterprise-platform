@@ -6,10 +6,11 @@ name: Build & Push Artefacts
 on:
   push:
     branches: [ master ]
-    tags:
-      - v*
   pull_request:
     branches: [ master ]
+
+env:
+  version: 1.0.$GITHUB_RUN_NUMBER
 
 jobs:
   maven-build:
@@ -26,7 +27,7 @@ jobs:
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
     - name: set maven artefact version
-      run: mvn versions:set -DnewVersion=1.0.$GITHUB_RUN_NUMBER
+      run: mvn versions:set -DnewVersion=$version
     
     - name: maven build
       run: mvn clean package --file pom.xml
@@ -58,22 +59,10 @@ jobs:
         # Change all uppercase to lowercase
         IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
-        # Strip git ref prefix from version
-        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-
-        # Strip "v" prefix from tag name
-        [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-
-        # Use Docker `latest` tag convention
-        [ "$VERSION" == "master" ] && VERSION=latest
-
-        echo IMAGE_ID=$IMAGE_ID
-        echo VERSION=$VERSION
-
-        docker tag $module $IMAGE_ID:$VERSION
-        docker push $IMAGE_ID:$VERSION
-        docker tag $module $IMAGE_ID:1.0.$GITHUB_RUN_NUMBER
-        docker push $IMAGE_ID:1.0.$GITHUB_RUN_NUMBER
+        docker tag $module $IMAGE_ID:latest
+        docker push $IMAGE_ID:latest
+        docker tag $module $IMAGE_ID:$version
+        docker push $IMAGE_ID:$version
 
     - name: docker push spring-cloud-config-server to github packages
       env:
@@ -84,19 +73,7 @@ jobs:
         # Change all uppercase to lowercase
         IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
-        # Strip git ref prefix from version
-        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-
-        # Strip "v" prefix from tag name
-        [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-
-        # Use Docker `latest` tag convention
-        [ "$VERSION" == "master" ] && VERSION=latest
-
-        echo IMAGE_ID=$IMAGE_ID
-        echo VERSION=$VERSION
-
-        docker tag $module $IMAGE_ID:$VERSION
-        docker push $IMAGE_ID:$VERSION
-        docker tag $module $IMAGE_ID:1.0.$GITHUB_RUN_NUMBER
-        docker push $IMAGE_ID:1.0.$GITHUB_RUN_NUMBER
+        docker tag $module $IMAGE_ID:latest
+        docker push $IMAGE_ID:latest
+        docker tag $module $IMAGE_ID:$version
+        docker push $IMAGE_ID:$version
