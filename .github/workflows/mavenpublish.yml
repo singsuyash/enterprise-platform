@@ -65,7 +65,7 @@ jobs:
         echo IMAGE_ID=$IMAGE_ID
         echo VERSION=$VERSION
 
-        docker tag image $IMAGE_ID:$VERSION
+        docker tag spring-cloud-config-client $IMAGE_ID:$VERSION
         docker push $IMAGE_ID:$VERSION
 
     - name: Push server image
@@ -87,5 +87,5 @@ jobs:
         echo IMAGE_ID=$IMAGE_ID
         echo VERSION=$VERSION
 
-        docker tag image $IMAGE_ID:$VERSION
+        docker tag spring-cloud-config-server $IMAGE_ID:$VERSION
         docker push $IMAGE_ID:$VERSION
