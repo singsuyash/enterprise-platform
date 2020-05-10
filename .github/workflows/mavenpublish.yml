@@ -27,7 +27,7 @@ jobs:
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
     - name: set maven artefact version
-      run: mvn versions:set -DnewVersion=$version
+      run: mvn versions:set -DnewVersion=${{ env.version }}
     
     - name: maven build
       run: mvn clean package --file pom.xml
@@ -59,8 +59,8 @@ jobs:
         # Change all uppercase to lowercase
         IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
-        docker tag $module $IMAGE_ID:$version
-        docker push $IMAGE_ID:$version
+        docker tag $module $IMAGE_ID:${{ env.version }}
+        docker push $IMAGE_ID:${{ env.version }}
 
     - name: docker push spring-cloud-config-server to github packages
       env:
@@ -71,5 +71,5 @@ jobs:
         # Change all uppercase to lowercase
         IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
-        docker tag $module $IMAGE_ID:$version
-        docker push $IMAGE_ID:$version
+        docker tag $module $IMAGE_ID:${{ env.version }}
+        docker push $IMAGE_ID:${{ env.version }}
