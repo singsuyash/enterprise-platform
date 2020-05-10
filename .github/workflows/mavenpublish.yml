@@ -1,7 +1,7 @@
 # This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
 # For more information see: https://github.com/actions/setup-java#apache-maven-with-a-settings-path
 
-name: Maven Package
+name: Build & Push Artefacts
 
 on:
   push:
@@ -10,45 +10,50 @@ on:
       - v*
   pull_request:
     branches: [ master ]
-  
-env:
-  ORG: singsuyash
-  TAG: 1.0.$GITHUB_RUN_NUMBER
 
 jobs:
-  build:
-
+  maven-build:
     runs-on: ubuntu-latest
-
     steps:
+    - name: git checkout
     - uses: actions/checkout@v2
-    - name: Set up JDK 1.8
+    
+    - name: set up jdk 1.8
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
-    - name: Maven version set
+    - name: set maven artefact version
       run: mvn versions:set -DnewVersion=1.0.$GITHUB_RUN_NUMBER
     
-    - name: Build with Maven
+    - name: maven build
       run: mvn clean package --file pom.xml
       
-    - name: Publish to GitHub Packages Apache Maven
+    - name: push maven artefacts to github packages
       run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
       env:
         GITHUB_TOKEN: ${{ github.token }}
     
-    - name: Build client image
-      run: docker build spring-cloud-config-client --file spring-cloud-config-client/Dockerfile --tag spring-cloud-config-client
-    - name: Build server image
-      run: docker build spring-cloud-config-server --file spring-cloud-config-server/Dockerfile --tag spring-cloud-config-server
-    - name: Log into registry
+    - name: docker build spring-cloud-config-client
+      env:
+        module: spring-cloud-config-client
+      run: docker build $module --file $module/Dockerfile --tag $module
+
+    - name: docker build spring-cloud-config-server
+      env:
+        module: spring-cloud-config-server
+      run: docker build $module --file $module/Dockerfile --tag $module
+
+    - name: docker login to github packages
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
-    - name: Push client image
+    
+    - name: docker push spring-cloud-config-client to github packages
+      env:
+        module: spring-cloud-config-client
       run: |
-        IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/spring-cloud-config-client
+        IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$module
         
         # Change all uppercase to lowercase
         IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
@@ -65,12 +70,14 @@ jobs:
         echo IMAGE_ID=$IMAGE_ID
         echo VERSION=$VERSION
 
-        docker tag spring-cloud-config-client $IMAGE_ID:$VERSION
+        docker tag $module $IMAGE_ID:$VERSION
         docker push $IMAGE_ID:$VERSION
 
-    - name: Push server image
+    - name: docker push spring-cloud-config-server to github packages
+      env:
+        module: spring-cloud-config-client
       run: |
-        IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/spring-cloud-config-server
+        IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$module
         
         # Change all uppercase to lowercase
         IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
@@ -87,5 +94,5 @@ jobs:
         echo IMAGE_ID=$IMAGE_ID
         echo VERSION=$VERSION
 
-        docker tag spring-cloud-config-server $IMAGE_ID:$VERSION
+        docker tag $module $IMAGE_ID:$VERSION
         docker push $IMAGE_ID:$VERSION
