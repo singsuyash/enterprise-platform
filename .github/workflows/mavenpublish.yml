@@ -10,6 +10,11 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  tags:
+    - v*
+env:
+  ORG: singsuyash
+  TAG: 1.0.$GITHUB_RUN_NUMBER
 
 jobs:
   build:
@@ -35,3 +40,71 @@ jobs:
       run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
       env:
         GITHUB_TOKEN: ${{ github.token }}
+
+  push-spring-cloud-config-client:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      MODULE: spring-cloud-config-client
+      IMAGE_NAME: $MODULE
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build image
+        run: docker build $MODULE --file $MODULE/Dockerfile --tag $IMAGE_NAME
+      - name: Log into registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+      - name: Push image
+        run: |
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
+          
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "master" ] && VERSION=latest
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+
+          docker tag image $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
+          
+  push-spring-cloud-config-server:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      MODULE: spring-cloud-config-server
+      IMAGE_NAME: $MODULE
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build image
+        run: docker build $MODULE --file $MODULE/Dockerfile --tag $IMAGE_NAME
+      - name: Log into registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+      - name: Push image
+        run: |
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
+          
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "master" ] && VERSION=latest
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+
+          docker tag image $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
