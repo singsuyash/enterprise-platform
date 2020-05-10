@@ -10,17 +10,12 @@ on:
     branches: [ master ]
 
 env:
-  version: 1.0.$GITHUB_RUN_NUMBER
+  version: 1.0.${GITHUB_RUN_NUMBER}
 
 jobs:
   maven-build:
     runs-on: ubuntu-latest
     steps:
-    - name: print github run number
-      run : echo ${{ 1.0.GITHUB_RUN_NUMBER }}
-    
-    - name: print version
-      run: echo $version
       
     - name: git checkout
       uses: actions/checkout@v2
