@@ -41,9 +41,9 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
     
     - name: Build client image
-      run: docker build spring-cloud-config-client --file spring-cloud-config-client/Dockerfile --tag 1.0.$GITHUB_RUN_NUMBER
+      run: docker build spring-cloud-config-client --file spring-cloud-config-client/Dockerfile --tag spring-cloud-config-client
     - name: Build server image
-      run: docker build spring-cloud-config-server --file spring-cloud-config-server/Dockerfile --tag 1.0.$GITHUB_RUN_NUMBER
+      run: docker build spring-cloud-config-server --file spring-cloud-config-server/Dockerfile --tag spring-cloud-config-server
     - name: Log into registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
     - name: Push client image
