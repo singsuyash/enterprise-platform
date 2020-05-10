@@ -39,79 +39,53 @@ jobs:
       run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
       env:
         GITHUB_TOKEN: ${{ github.token }}
+    
+    - name: Build client image
+      run: docker build spring-cloud-config-client --file spring-cloud-config-client/Dockerfile --tag 1.0.$GITHUB_RUN_NUMBER
+    - name: Build server image
+      run: docker build spring-cloud-config-server --file spring-cloud-config-server/Dockerfile --tag 1.0.$GITHUB_RUN_NUMBER
+    - name: Log into registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+    - name: Push client image
+      run: |
+        IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/spring-cloud-config-client
+        
+        # Change all uppercase to lowercase
+        IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
-  push-spring-cloud-config-client:
-    needs: build
-    runs-on: ubuntu-latest
-    env:
-      MODULE: spring-cloud-config-client
-      IMAGE_NAME: $MODULE
-    steps:
-      - uses: actions/checkout@v2
-      - name: PWD
-        run: pwd
-      - name: Directory structure
-        run: ls -halt spring-cloud-config-client/target
-      - name: Build image
-        run: cd spring-cloud-config-client && docker build . --file ./Dockerfile --tag 1.0.$GITHUB_RUN_NUMBER
-      - name: Log into registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
-      - name: Push image
-        run: |
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
-          
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+        # Strip git ref prefix from version
+        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
 
-          # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+        # Strip "v" prefix from tag name
+        [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+        # Use Docker `latest` tag convention
+        [ "$VERSION" == "master" ] && VERSION=latest
 
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=latest
+        echo IMAGE_ID=$IMAGE_ID
+        echo VERSION=$VERSION
 
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
+        docker tag image $IMAGE_ID:$VERSION
+        docker push $IMAGE_ID:$VERSION
 
-          docker tag image $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+    - name: Push server image
+      run: |
+        IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/spring-cloud-config-server
+        
+        # Change all uppercase to lowercase
+        IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
-  push-spring-cloud-config-server:
-    needs: build
-    runs-on: ubuntu-latest
-    env:
-      MODULE: spring-cloud-config-server
-      IMAGE_NAME: $MODULE
-    steps:
-      - uses: actions/checkout@v2
-      - name: PWD
-        run: pwd
-      - name: Directory structure
-        run: ls -halt spring-cloud-config-server/target
-      - name: Build image
-        run: cd spring-cloud-config-server && docker build . --file ./Dockerfile --tag 1.0.$GITHUB_RUN_NUMBER
-      - name: Log into registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
-      - name: Push image
-        run: |
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
-          
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+        # Strip git ref prefix from version
+        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
 
-          # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+        # Strip "v" prefix from tag name
+        [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+        # Use Docker `latest` tag convention
+        [ "$VERSION" == "master" ] && VERSION=latest
 
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=latest
+        echo IMAGE_ID=$IMAGE_ID
+        echo VERSION=$VERSION
 
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-
-          docker tag image $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+        docker tag image $IMAGE_ID:$VERSION
+        docker push $IMAGE_ID:$VERSION
