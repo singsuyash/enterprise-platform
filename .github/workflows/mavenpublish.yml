@@ -65,7 +65,7 @@ jobs:
 
     - name: docker push spring-cloud-config-server to github packages
       env:
-        module: spring-cloud-config-client
+        module: spring-cloud-config-server
       run: |
         IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$module
         
