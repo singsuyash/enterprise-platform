@@ -1,3 +1,5 @@
+![Maven Package](https://github.com/singsuyash/enterprise-platform/workflows/Maven%20Package/badge.svg)
+
 # Conctacts
 [mail](mailto:loafvantage@gmail.com)
 [slack](https://vantage-loaf.slack.com)
