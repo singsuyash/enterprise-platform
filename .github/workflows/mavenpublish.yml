@@ -31,6 +31,12 @@ jobs:
     - name: Build with Maven
       run: mvn clean package --file pom.xml
     
+    - name: Display spring-cloud-config-client target folder
+      run: ls -halt spring-cloud-config-client/target
+    
+    - name: Display spring-cloud-config-server target folder
+      run: ls -halt spring-cloud-config-server/target
+    
     - name: Maven version revert
       run: mvn versions:revert
 
