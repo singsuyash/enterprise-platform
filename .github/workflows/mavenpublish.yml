@@ -47,6 +47,7 @@ jobs:
       MODULE: spring-cloud-config-client
       IMAGE_NAME: $MODULE
     steps:
+      - uses: actions/checkout@v2
       - name: PWD
         run: pwd
       - name: Directory structure
@@ -84,6 +85,7 @@ jobs:
       MODULE: spring-cloud-config-server
       IMAGE_NAME: $MODULE
     steps:
+      - uses: actions/checkout@v2
       - name: PWD
         run: pwd
       - name: Directory structure
