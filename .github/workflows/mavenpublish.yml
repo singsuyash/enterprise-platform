@@ -16,6 +16,9 @@ jobs:
   maven-build:
     runs-on: ubuntu-latest
     steps:
+    - name: print github run number
+      run : echo $GITHUB_RUN_NUMBER
+    
     - name: print version
       run: echo $version
       
