@@ -4,8 +4,6 @@
 name: Maven Package
 
 on:
-  release:
-    types: [created]
   push:
     branches: [ master ]
   pull_request:
@@ -74,7 +72,7 @@ jobs:
 
           docker tag image $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
-          
+
   push-spring-cloud-config-server:
     needs: build
     runs-on: ubuntu-latest
