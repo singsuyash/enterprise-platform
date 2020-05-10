@@ -51,7 +51,7 @@ jobs:
       - name: PWD
         run: pwd
       - name: Directory structure
-        run: ls -halt
+        run: ls -halt spring-cloud-config-client/target
       - name: Build image
         run: cd spring-cloud-config-client && docker build . --file ./Dockerfile --tag 1.0.$GITHUB_RUN_NUMBER
       - name: Log into registry
@@ -89,7 +89,7 @@ jobs:
       - name: PWD
         run: pwd
       - name: Directory structure
-        run: ls -halt
+        run: ls -halt spring-cloud-config-server/target
       - name: Build image
         run: cd spring-cloud-config-server && docker build . --file ./Dockerfile --tag 1.0.$GITHUB_RUN_NUMBER
       - name: Log into registry
