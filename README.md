@@ -12,3 +12,7 @@
 - https://vsupalov.com/docker-env-vars/
 - https://www.baeldung.com/spring-boot-actuators
 
+# Application startup
+- mvn -pl spring-cloud-config-server spring-boot:run -Dspring-boot.run.profiles=<local/development/production>
+- mvn -pl spring-cloud-config-client spring-boot:run -Dspring-boot.run.profiles=<local/development/production>
+
