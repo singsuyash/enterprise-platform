@@ -1,16 +1,29 @@
 server:
   port: 8888
 
-spring:
-  cloud:
-    config:
-      server:
-        git:
-          uri: file:///Users/suyashs/Projects/spring-cloud-config
-          clone-on-start: true
-
 management:
   endpoints:
     web:
       exposure:
         include: conditions,env,health,httptrace,info,keepalive,krypt,logfile,refresh,beans,metrics,mappings
+---
+spring:
+  profiles:
+  - local
+  cloud:
+    config:
+      server:
+        git:
+          uri: file:///Users/suyashs/Projects/enterprise-platform/spring-cloud-config
+          clone-on-start: true
+---
+spring:
+  profiles:
+  - development
+  - production
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/singsuyash/spring-cloud-config
+          clone-on-start: true
