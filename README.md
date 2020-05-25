@@ -11,6 +11,7 @@
 - https://stackoverflow.com/questions/37700352/setting-the-default-active-profile-in-spring-boot
 - https://vsupalov.com/docker-env-vars/
 - https://www.baeldung.com/spring-boot-actuators
+- https://www.baeldung.com/java-logging-intro
 
 # Application startup
 - mvn -pl spring-cloud-config-server spring-boot:run -Dspring-boot.run.profiles=<local/development/production>
